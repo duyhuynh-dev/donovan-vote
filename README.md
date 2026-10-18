@@ -26,6 +26,8 @@ Open `http://localhost:8000`. Opening `index.html` directly as a local file will
 3. In Google Trends, find **Interest by region**, choose the **Subregion** view if needed, and download its CSV.
 4. Upload that CSV in the app. The app checks the term and dates when they appear in the CSV header. Export each term/year separately.
 
+Entering a term opens the matching Google Trends page. The map shows the **combined view** after its regional CSV is uploaded: blue/red indicate the statewide election winner, and darker shades indicate higher search interest. Without that CSV, the app has no search-interest values to map.
+
 Google Trends values are relative search-interest scores (0–100), not counts. The comparison uses an **unweighted mean of state scores** by statewide winning party. It does not show how individual voters searched or voted, and it cannot establish causation.
 
 Google's [Trends API is currently an access-limited alpha](https://developers.google.com/search/apis/trends), so automatic arbitrary-term retrieval is outside this free static MVP. CSV export is supported by [Google Trends](https://support.google.com/trends/answer/4365538?hl=en).

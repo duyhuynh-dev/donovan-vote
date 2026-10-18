@@ -39,6 +39,21 @@ function updateTerm() {
   updateAll();
 }
 
+function exploreTerm() {
+  updateTerm();
+  if (!state.term) { $('term').focus(); setStatus('Enter a search term first.', 'error'); return; }
+  state.mode = 'combined';
+  updateAll();
+  if (activeScores()) {
+    $('us-map').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } else {
+    window.open(trendsUrl(), '_blank', 'noopener');
+    $('trends-card').classList.add('needs-data');
+    $('trends-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setStatus(`Google Trends opened for “${state.term}”. Download its “Interest by region” CSV, then upload it here to update the map.`, '');
+  }
+}
+
 function trendsUrl() {
   const range = WINDOWS[state.year];
   const params = new URLSearchParams({ date: `${range.start} ${range.end}`, geo: 'US' });
@@ -56,6 +71,11 @@ function mapColor(code, scores) {
   const value = scores && scores[code];
   if (value === undefined) return COLORS.none;
   const t = Math.max(0, Math.min(1, value / 100));
+  if (state.mode === 'combined') {
+    const base = winner(code) === 'D' ? [44, 102, 139] : [191, 88, 74];
+    const pale = [242, 244, 240];
+    return `rgb(${base.map((n, i) => Math.round(pale[i] + (n - pale[i]) * (0.16 + 0.84 * t))).join(',')})`;
+  }
   const from = [229, 240, 235], to = [27, 124, 120];
   return `rgb(${from.map((n, i) => Math.round(n + (to[i] - n) * t)).join(',')})`;
 }
@@ -86,6 +106,8 @@ function renderMap() {
   legend.replaceChildren();
   if (state.mode === 'election') {
     legend.innerHTML = '<span class="legend-item"><i class="legend-swatch" style="background:#527fa5"></i>Democratic</span><span class="legend-item"><i class="legend-swatch" style="background:#c96f61"></i>Republican</span>';
+  } else if (state.mode === 'combined') {
+    legend.innerHTML = '<span class="legend-item"><i class="legend-swatch" style="background:#527fa5"></i>Democratic winner</span><span class="legend-item"><i class="legend-swatch" style="background:#c96f61"></i>Republican winner</span><span class="legend-item">Darker = more searches</span><span class="legend-item"><i class="legend-swatch" style="background:#e3e8e5"></i>No data</span>';
   } else {
     legend.innerHTML = '<span class="legend-item">0 <i class="legend-gradient"></i> 100</span><span class="legend-item"><i class="legend-swatch" style="background:#e3e8e5"></i>No data</span>';
   }
@@ -152,13 +174,19 @@ function updateAll() {
   const range = WINDOWS[state.year];
   $('date-range').textContent = range.label;
   $('map-title').textContent = `${state.year} election map`;
-  $('map-subtitle').textContent = state.mode === 'election' ? 'Select a state to inspect its result.' : 'Darker teal means higher relative search interest.';
+  $('map-subtitle').textContent = state.mode === 'election' ? 'Select a state to inspect its result.' : state.mode === 'combined' ? 'Blue and red show the statewide winner; darker shades show more search interest.' : 'Darker teal means higher relative search interest.';
   $('trends-link').href = trendsUrl();
+  $('mode-combined').classList.toggle('active', state.mode === 'combined');
   $('mode-election').classList.toggle('active', state.mode === 'election');
   $('mode-interest').classList.toggle('active', state.mode === 'interest');
+  $('mode-combined').setAttribute('aria-pressed', state.mode === 'combined');
   $('mode-election').setAttribute('aria-pressed', state.mode === 'election');
   $('mode-interest').setAttribute('aria-pressed', state.mode === 'interest');
   const scores = activeScores();
+  $('data-callout').classList.toggle('ready', !!scores);
+  $('data-callout-text').textContent = scores ? `Showing “${state.term}” search interest beside ${state.year} election outcomes. Darker state colors mean more searches.` : state.term ? `The election map has no search data for “${state.term}” in ${state.year} yet. Upload a regional Google Trends CSV to reveal the relationship.` : 'The map currently shows election results. Add Google Trends regional data to compare a search term.';
+  $('jump-upload').textContent = scores ? 'View comparison ↓' : 'How to add data ↓';
+  $('trends-card').classList.toggle('needs-data', !!state.term && !scores && state.mode === 'combined');
   setStatus(scores ? `${Object.keys(scores).length} regions loaded for “${state.term}” in ${state.year}. Stored in this browser.` : state.term ? `No Trends data loaded for “${state.term}” in ${state.year}.` : 'Enter a search term, then upload its regional Trends CSV.');
   renderMap();
   renderDetail();
@@ -235,7 +263,7 @@ async function importCsv(file) {
     }
     state.imported[`${state.year}::${state.term.toLowerCase()}`] = scores;
     saveImports();
-    state.mode = 'interest';
+    state.mode = 'combined';
     updateAll();
     setStatus(`${Object.keys(scores).length} regions loaded for “${state.term}” in ${state.year}. Check that the Trends export used ${WINDOWS[state.year].label}.`, 'success');
   } catch (error) { setStatus(error.message || 'Could not read that CSV.', 'error'); }
@@ -254,9 +282,11 @@ async function init() {
     picker.value = state.selected;
     picker.addEventListener('change', () => chooseState(picker.value));
     $('year').addEventListener('change', () => { state.year = $('year').value; updateAll(); });
-    $('apply-term').addEventListener('click', updateTerm);
-    $('term').addEventListener('keydown', (event) => { if (event.key === 'Enter') updateTerm(); });
+    $('apply-term').addEventListener('click', exploreTerm);
+    $('term').addEventListener('keydown', (event) => { if (event.key === 'Enter') exploreTerm(); });
     $('term').addEventListener('change', updateTerm);
+    $('jump-upload').addEventListener('click', () => (activeScores() ? $('comparison-body') : $('trends-card')).scrollIntoView({ behavior: 'smooth', block: 'center' }));
+    $('mode-combined').addEventListener('click', () => { state.mode = 'combined'; updateAll(); });
     $('mode-election').addEventListener('click', () => { state.mode = 'election'; updateAll(); });
     $('mode-interest').addEventListener('click', () => { state.mode = 'interest'; updateAll(); });
     $('trends-link').addEventListener('click', (event) => { updateTerm(); if (!state.term) { event.preventDefault(); $('term').focus(); setStatus('Enter a search term before opening Google Trends.', 'error'); } });
@@ -266,4 +296,4 @@ async function init() {
 }
 
 if (typeof document !== 'undefined') init();
-if (typeof module !== 'undefined') module.exports = { parseCsv, parseTrendsCsv, dateFromHeader, state, WINDOWS, winner };
+if (typeof module !== 'undefined') module.exports = { parseCsv, parseTrendsCsv, dateFromHeader, state, WINDOWS, winner, mapColor };

@@ -34,16 +34,18 @@
         </div>
         <div class="field term-field">
           <label for="term">Search term</label>
-          <div class="term-row"><span class="search-icon" aria-hidden="true">⌕</span><input id="term" type="search" placeholder="Try “zombie”" autocomplete="off" maxlength="100"><button id="apply-term" class="primary-button" type="button">Explore term <span aria-hidden="true">→</span></button></div>
+          <div class="term-row"><span class="search-icon" aria-hidden="true">⌕</span><input id="term" type="search" placeholder="Try “zombie”" autocomplete="off" maxlength="100"><button id="apply-term" class="primary-button" type="button">Get search data <span aria-hidden="true">↗</span></button></div>
         </div>
         <div class="window-label"><span>GOOGLE TRENDS WINDOW</span><strong id="date-range"></strong></div>
       </section>
+
+      <div id="data-callout" class="data-callout" role="status"><span id="data-callout-text">The map currently shows election results. Add Google Trends regional data to compare a search term.</span><button id="jump-upload" type="button">How to add data <span aria-hidden="true">↓</span></button></div>
 
       <section class="workspace" aria-label="Election and search map">
         <div class="map-panel">
           <div class="panel-heading">
             <div><p class="section-kicker">STATE BY STATE</p><h2 id="map-title">2024 election map</h2><p id="map-subtitle" class="muted">Select a state to inspect its result.</p></div>
-            <div class="segmented" role="group" aria-label="Map color mode"><button id="mode-election" class="active" type="button" aria-pressed="true">Election</button><button id="mode-interest" type="button" aria-pressed="false">Search interest</button></div>
+            <div class="segmented" role="group" aria-label="Map color mode"><button id="mode-combined" type="button" aria-pressed="false">Combined</button><button id="mode-election" class="active" type="button" aria-pressed="true">Election</button><button id="mode-interest" type="button" aria-pressed="false">Interest</button></div>
           </div>
           <div class="map-wrap"><svg id="us-map" viewBox="0 0 900 560" role="img" aria-label="Interactive map of US states"></svg></div>
           <div class="map-footer"><div id="legend" class="legend"></div><label class="state-jump">Jump to state <select id="state-picker" aria-label="Jump to a state"></select></label></div>
@@ -59,7 +61,7 @@
       </section>
 
       <section id="trends-card" class="trends-card" aria-labelledby="trends-title">
-        <div class="trends-intro"><div><p class="section-kicker">ADD SEARCH DATA</p><h2 id="trends-title">Connect a search term to the map</h2><p>Open Google Trends with this term and date window. Under <strong>Interest by region</strong>, download the CSV and drop it here.</p></div><div class="step-number">01 / 02</div></div>
+        <div class="trends-intro"><div><p class="section-kicker">ADD SEARCH DATA</p><h2 id="trends-title">Connect a search term to the map</h2><p><strong>1.</strong> Open Google Trends with your term and this election’s date window. <strong>2.</strong> In <strong>Interest by region</strong>, select <strong>Subregion</strong> and download its CSV. <strong>3.</strong> Upload the CSV here. The map and comparison will update immediately.</p></div><div class="step-number">01 / 02</div></div>
         <div class="import-actions"><a id="trends-link" class="outline-button" href="https://trends.google.com/trends/explore?geo=US" target="_blank" rel="noopener noreferrer">Open Google Trends <span aria-hidden="true">↗</span></a><label class="upload-button" for="trends-file">Upload regional CSV <span aria-hidden="true">↑</span></label><input id="trends-file" type="file" accept=".csv,text/csv"></div>
         <p id="upload-status" class="upload-status" role="status">No Trends data loaded for this term and election.</p>
       </section>

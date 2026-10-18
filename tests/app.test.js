@@ -2,7 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { parseTrendsCsv, dateFromHeader, state, winner, WINDOWS } = require('../app.js');
+const { parseTrendsCsv, dateFromHeader, state, winner, mapColor, WINDOWS } = require('../app.js');
 
 state.votes = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/election-2024.json'), 'utf8'));
 state.year = '2024';
@@ -44,4 +44,13 @@ test('time series CSV does not masquerade as a regional CSV', () => {
 test('Google Trends date text accepts short and ISO years', () => {
   assert.equal(dateFromHeader('1/20/21'), '2021-01-20');
   assert.equal(dateFromHeader('2025-01-20'), '2025-01-20');
+});
+
+test('combined map uses party hue and search score intensity together', () => {
+  state.year = '2024';
+  state.mode = 'combined';
+  const scores = { CA: 100, PA: 100 };
+  assert.notEqual(mapColor('CA', scores), mapColor('PA', scores));
+  assert.notEqual(mapColor('CA', { CA: 0 }), mapColor('CA', scores));
+  assert.equal(mapColor('NY', scores), '#e3e8e5');
 });
