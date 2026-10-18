@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore state election results alongside Google Trends search interest for five presidential election windows.">
+  <title>Search &amp; the Vote</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="site-shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">◎</span><span>SEARCH <em>&amp;</em> THE VOTE</span></div>
+      <a class="top-link" href="#how-it-works">How it works <span aria-hidden="true">↗</span></a>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="page-title">
+        <div class="eyebrow"><span class="live-dot"></span> US ELECTION EXPLORER <span class="eyebrow-line"></span> 2008—2024</div>
+        <h1 id="page-title">What were states <em>searching</em> for?</h1>
+        <p>Explore Google search interest alongside presidential election results. Choose a term, bring in regional Trends data, and see the pattern state by state.</p>
+      </section>
+
+      <section class="control-card" aria-label="Explore a search term">
+        <div class="field election-field">
+          <label for="year">Election</label>
+          <select id="year">
+            <option value="2024">2024 election</option>
+            <option value="2020">2020 election</option>
+            <option value="2016">2016 election</option>
+            <option value="2012">2012 election</option>
+            <option value="2008">2008 election</option>
+          </select>
+        </div>
+        <div class="field term-field">
+          <label for="term">Search term</label>
+          <div class="term-row"><span class="search-icon" aria-hidden="true">⌕</span><input id="term" type="search" placeholder="Try “zombie”" autocomplete="off" maxlength="100"><button id="apply-term" class="primary-button" type="button">Explore term <span aria-hidden="true">→</span></button></div>
+        </div>
+        <div class="window-label"><span>GOOGLE TRENDS WINDOW</span><strong id="date-range"></strong></div>
+      </section>
+
+      <section class="workspace" aria-label="Election and search map">
+        <div class="map-panel">
+          <div class="panel-heading">
+            <div><p class="section-kicker">STATE BY STATE</p><h2 id="map-title">2024 election map</h2><p id="map-subtitle" class="muted">Select a state to inspect its result.</p></div>
+            <div class="segmented" role="group" aria-label="Map color mode"><button id="mode-election" class="active" type="button" aria-pressed="true">Election</button><button id="mode-interest" type="button" aria-pressed="false">Search interest</button></div>
+          </div>
+          <div class="map-wrap"><svg id="us-map" viewBox="0 0 900 560" role="img" aria-label="Interactive map of US states"></svg></div>
+          <div class="map-footer"><div id="legend" class="legend"></div><label class="state-jump">Jump to state <select id="state-picker" aria-label="Jump to a state"></select></label></div>
+        </div>
+
+        <aside class="detail-panel" aria-live="polite">
+          <p class="section-kicker">STATE DETAIL</p>
+          <div class="detail-top"><div><h2 id="state-name">Pennsylvania</h2><span id="state-code" class="state-code">PA</span></div><span id="winner-pill" class="winner-pill republican">Republican win</span></div>
+          <div class="stat-block"><span id="vote-label" class="stat-label">2024 VOTE SHARE</span><div id="vote-content"></div></div>
+          <div class="stat-block interest-block"><span class="stat-label">SEARCH INTEREST</span><div id="interest-content" class="interest-content"></div></div>
+          <div class="detail-note">Search interest is a relative Google Trends index, not a vote count or a measure of individual voters’ views.</div>
+        </aside>
+      </section>
+
+      <section id="trends-card" class="trends-card" aria-labelledby="trends-title">
+        <div class="trends-intro"><div><p class="section-kicker">ADD SEARCH DATA</p><h2 id="trends-title">Connect a search term to the map</h2><p>Open Google Trends with this term and date window. Under <strong>Interest by region</strong>, download the CSV and drop it here.</p></div><div class="step-number">01 / 02</div></div>
+        <div class="import-actions"><a id="trends-link" class="outline-button" href="https://trends.google.com/trends/explore?geo=US" target="_blank" rel="noopener noreferrer">Open Google Trends <span aria-hidden="true">↗</span></a><label class="upload-button" for="trends-file">Upload regional CSV <span aria-hidden="true">↑</span></label><input id="trends-file" type="file" accept=".csv,text/csv"></div>
+        <p id="upload-status" class="upload-status" role="status">No Trends data loaded for this term and election.</p>
+      </section>
+
+      <section class="comparison" aria-labelledby="comparison-title"><div class="comparison-head"><div><p class="section-kicker">THE COMPARISON</p><h2 id="comparison-title">Search interest by state winner</h2></div><span id="coverage" class="coverage">Awaiting Trends data</span></div><div id="comparison-body" class="comparison-body"><p>Upload a regional Google Trends CSV to compare the average search-interest score in states won by each party.</p></div></section>
+
+      <section id="how-it-works" class="methodology"><div><p class="section-kicker">HOW TO READ THIS</p><h2>Patterns, not predictions.</h2></div><div><p>Election colors show each state’s statewide presidential winner. The 2024 vote shares come from the supplied project CSV. For 2008–2020, the map shows statewide winners only. Maine and Nebraska are colored by their statewide result, even in years when electoral votes split by district.</p><p>Google Trends scores are normalized from 0–100 for the selected term, location, and date window. Comparing state scores can reveal a geographic pattern, but it cannot tell us how a person voted or why they searched.</p><p class="source-links">Sources: <a href="https://www.archives.gov/electoral-college/results" target="_blank" rel="noopener noreferrer">National Archives election results ↗</a> · <a href="https://support.google.com/trends/answer/4365538?hl=en" target="_blank" rel="noopener noreferrer">Google Trends export guide ↗</a> · <a href="https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html" target="_blank" rel="noopener noreferrer">US Census map boundaries ↗</a></p></div></section>
+    </main>
+    <footer><span>SEARCH &amp; THE VOTE</span><span>An exploratory data project · Built for static hosting</span></footer>
+  </div>
+  <script src="app.js" defer></script>
+</body>
+</html>
